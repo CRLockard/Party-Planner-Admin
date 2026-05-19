@@ -1,6 +1,6 @@
 // === Constants ===
 const BASE = "https://fsa-crud-2aa9294fe819.herokuapp.com/api";
-const COHORT = ""; // Make sure to change this!
+const COHORT = "/corey"; // Make sure to change this!
 const API = BASE + COHORT;
 
 // === State ===
@@ -57,7 +57,62 @@ async function getGuests() {
   }
 }
 
+//POST function to add a new party
+async function addParty(newParty) {
+  try {
+    await fetch(API, {
+      method: "POST",
+      headers: { "content-Type": "application/json" },
+      body: JSON.stringify(artist),
+    });
+    await getArtists();
+  } catch (e) {
+    console.error("There was an error on addArtist", e);
+  }
+}
+
 // === Components ===
+
+//Add a form to enter a new party
+function NewPartyForm() {
+  const $form = document.createElement("form");
+  $form.innerHTML = `
+  
+    <label>
+      Name
+      <input name="name" required />
+    </label>
+
+    <label>
+      Description
+      <input name="description" required />
+    </label>
+
+     <label>
+      Date
+      <input name="date" required />
+    </label>
+
+    <label>
+      Location
+      <input name="location" required />
+    </label>
+
+    <button>Add Party</button>
+  `;
+  $form.addEventListener("submit", function (event) {
+    event.preventDefault();
+
+    const data = new FormData($form);
+    addParty({
+      name: data.get("name"),
+      description: data.get("description"),
+      date: data.get("date"),
+      location: data.get("location"),
+    });
+  });
+  return $form;
+}
 
 /** Party name that shows more details about the party when clicked */
 function PartyListItem(party) {
@@ -113,8 +168,8 @@ function GuestList() {
   const $ul = document.createElement("ul");
   const guestsAtParty = guests.filter((guest) =>
     rsvps.find(
-      (rsvp) => rsvp.guestId === guest.id && rsvp.eventId === selectedParty.id
-    )
+      (rsvp) => rsvp.guestId === guest.id && rsvp.eventId === selectedParty.id,
+    ),
   );
 
   // Simple components can also be created anonymously:
@@ -137,6 +192,8 @@ function render() {
       <section>
         <h2>Upcoming Parties</h2>
         <PartyList></PartyList>
+        <h2>Add a new party</h2>
+        <NewPartyForm></NewPartyForm>
       </section>
       <section id="selected">
         <h2>Party Details</h2>
@@ -147,6 +204,7 @@ function render() {
 
   $app.querySelector("PartyList").replaceWith(PartyList());
   $app.querySelector("SelectedParty").replaceWith(SelectedParty());
+  $app.querySelector("NewPartyForm").replaceWith(NewPartyForm());
 }
 
 async function init() {
