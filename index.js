@@ -1,6 +1,7 @@
 // === Constants ===
 const BASE = "https://fsa-crud-2aa9294fe819.herokuapp.com/api";
 const COHORT = "/corey"; // Make sure to change this!
+const EVENTS = "/events";
 const API = BASE + COHORT;
 
 // === State ===
@@ -60,7 +61,7 @@ async function getGuests() {
 //POST function to add a new party
 async function addParty(newParty) {
   try {
-    await fetch(API + "/events", {
+    await fetch(API + EVENTS, {
       method: "POST",
       headers: { "content-Type": "application/json" },
       body: JSON.stringify(newParty),
@@ -68,6 +69,18 @@ async function addParty(newParty) {
     await getParties();
   } catch (e) {
     console.error("There was an error on addParty", e);
+  }
+}
+
+async function removeParty(id) {
+  try {
+    await fetch(`${API}${EVENTS}/${id}`, {
+      method: "DELETE",
+    });
+    selectedParty = undefined;
+    getParties();
+  } catch (e) {
+    console.error("There was an error in removeParty", e);
   }
 }
 
@@ -157,9 +170,13 @@ function SelectedParty() {
     <address>${selectedParty.location}</address>
     <p>${selectedParty.description}</p>
     <GuestList></GuestList>
+    <button id="delete">Remove Event</button>
   `;
   $party.querySelector("GuestList").replaceWith(GuestList());
-
+  const $delete = $party.querySelector("button#delete");
+  $delete.addEventListener("click", async function (event) {
+    await removeParty(selectedParty.id);
+  });
   return $party;
 }
 
