@@ -60,14 +60,14 @@ async function getGuests() {
 //POST function to add a new party
 async function addParty(newParty) {
   try {
-    await fetch(API, {
+    await fetch(API + "/events", {
       method: "POST",
       headers: { "content-Type": "application/json" },
-      body: JSON.stringify(artist),
+      body: JSON.stringify(newParty),
     });
-    await getArtists();
+    await getParties();
   } catch (e) {
-    console.error("There was an error on addArtist", e);
+    console.error("There was an error on addParty", e);
   }
 }
 
@@ -90,7 +90,7 @@ function NewPartyForm() {
 
      <label>
       Date
-      <input name="date" required />
+      <input type="date" name="date" required />
     </label>
 
     <label>
@@ -107,7 +107,7 @@ function NewPartyForm() {
     addParty({
       name: data.get("name"),
       description: data.get("description"),
-      date: data.get("date"),
+      date: new Date(data.get("date")).toISOString(),
       location: data.get("location"),
     });
   });
